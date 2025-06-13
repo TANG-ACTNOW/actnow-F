@@ -1,6 +1,8 @@
+'use client';
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 
-interface ModalWithSidebarProps {
+interface SettingModalProps {
   open: boolean;
   onClose: () => void;
 }
@@ -10,12 +12,12 @@ const sidebarItems = [
   { key: 'plan', label: '计划' },
 ];
 
-export default function ModalWithSidebar({ open, onClose }: ModalWithSidebarProps) {
+export default function SettingModal({ open, onClose }: SettingModalProps) {
   const [selected, setSelected] = useState('profile');
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
       <div className="bg-white rounded-xl shadow-lg w-[520px] max-w-full flex flex-col p-0 relative">
         {/* 头部 */}
@@ -60,6 +62,7 @@ export default function ModalWithSidebar({ open, onClose }: ModalWithSidebarProp
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 } 

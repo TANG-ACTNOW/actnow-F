@@ -1,15 +1,21 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import ModalWithSidebar from './ModalWithSidebar';
+import Setting from './buttons/Setting';
+import Create from './buttons/Create';
+import { MemoResponse } from '@/types/memo';
 
-export default function FloatingButtonGroup() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+interface FloatingButtonGroupProps {
+  onMemoCreate: (memo: MemoResponse) => void;
+}
+
+export default function FloatingButtonGroup({ onMemoCreate }: FloatingButtonGroupProps) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   // 设置初始位置
   useEffect(() => {
@@ -21,8 +27,28 @@ export default function FloatingButtonGroup() {
         x: containerRect.width - buttonRect.width - 60,
         y: containerRect.height - buttonRect.height - 60
       });
+      // 设置位置后再显示
+      setIsVisible(true);
     }
   }, []);
+
+  // 监听窗口大小变化，更新位置
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current && buttonRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const buttonRect = buttonRef.current.getBoundingClientRect();
+        
+        setPosition({
+          x: Math.min(position.x, containerRect.width - buttonRect.width - 60),
+          y: Math.min(position.y, containerRect.height - buttonRect.height - 60)
+        });
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [position]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -45,19 +71,7 @@ export default function FloatingButtonGroup() {
       }
     };
 
-    const handleMouseUp = (e: MouseEvent) => {
-      if (isDragging) {
-        // 计算拖动距离
-        const dragDistance = Math.sqrt(
-          Math.pow(e.clientX - startPosition.x, 2) + 
-          Math.pow(e.clientY - startPosition.y, 2)
-        );
-        
-        // 如果拖动距离小于5像素，认为是点击
-        if (dragDistance < 5) {
-          setIsModalOpen(true);
-        }
-      }
+    const handleMouseUp = () => {
       setIsDragging(false);
     };
 
@@ -70,7 +84,7 @@ export default function FloatingButtonGroup() {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, dragOffset, startPosition]);
+  }, [isDragging, dragOffset]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (buttonRef.current) {
@@ -79,7 +93,6 @@ export default function FloatingButtonGroup() {
         x: e.clientX - rect.left,
         y: e.clientY - rect.top
       });
-      // 记录开始拖动的位置
       setStartPosition({
         x: e.clientX,
         y: e.clientY
@@ -89,41 +102,36 @@ export default function FloatingButtonGroup() {
   };
 
   return (
-    <>
+    <div 
+      ref={containerRef}
+      className="fixed inset-0 pointer-events-none"
+      style={{ zIndex: 9999 }}
+    >
       <div 
-        ref={containerRef}
-        className="fixed inset-0 pointer-events-none"
+        ref={buttonRef}
+        onMouseDown={handleMouseDown}
+        style={{
+          transform: `translate(${position.x}px, ${position.y}px)`,
+          cursor: isDragging ? 'grabbing' : 'grab',
+          opacity: isVisible ? 1 : 0,
+          transition: 'opacity 0.1s ease-in-out',
+          zIndex: 9999
+        }}
+        className="absolute select-none pointer-events-auto flex flex-col gap-4 p-4 rounded-2xl bg-[#F5F5DC] shadow-lg"
       >
-        <div 
-          ref={buttonRef}
-          onMouseDown={handleMouseDown}
-          style={{
-            transform: `translate(${position.x}px, ${position.y}px)`,
-            cursor: isDragging ? 'grabbing' : 'grab'
-          }}
-          className="absolute select-none pointer-events-auto"
-        >
-          <button
-            className="w-14 h-14 bg-indigo-500 text-white rounded-full shadow-lg hover:bg-indigo-600 transition-all duration-300 flex items-center justify-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-          </button>
-        </div>
+        <Create onMemoCreate={onMemoCreate} />
+        <button className="w-14 h-14 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition-all duration-300 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+          </svg>
+        </button>
+        <button className="w-14 h-14 bg-yellow-500 text-white rounded-full shadow-lg hover:bg-yellow-600 transition-all duration-300 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+        </button>
+        <Setting />
       </div>
-      <ModalWithSidebar open={isModalOpen} onClose={() => setIsModalOpen(false)} />
-    </>
+    </div>
   );
 } 

@@ -1,10 +1,10 @@
 'use client';
-import FloatingButtonGroup from '@/components/FloatingButtonGroup';
+import Board from '@/components/Board';
 
 export default function Home() {
   return (
-    <div className="min-h-screen relative">
-      <FloatingButtonGroup />
+    <div className="min-h-screen">
+      <Board />
     </div>
   );
 }
