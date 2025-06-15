@@ -43,7 +43,7 @@ export default function Create({ onMemoCreate }: CreateProps) {
         content: '',
         x: window.innerWidth / 2 - 128, // 居中显示
         y: window.innerHeight / 2 - 100,
-        zIndex: 0, // 初始 zIndex 设为 0，由 Board 组件处理实际的 zIndex
+        zIndex: 4, // 初始 zIndex 设为 0，由 Board 组件处理实际的 zIndex
         style: {
           id: 1,
           code: 'default',
