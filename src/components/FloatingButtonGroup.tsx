@@ -1,14 +1,18 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import Setting from './buttons/Setting';
-import Create from './buttons/Create';
+import Setting from '@/components/buttons/Setting';
+import Create from '@/components/buttons/Create';
 import { MemoResponse } from '@/types/memo';
+import { ModalManager } from '@/components/modals/ModalManager';
+import { useApp } from '@/contexts/AppContext';
 
 interface FloatingButtonGroupProps {
   onMemoCreate: (memo: MemoResponse) => void;
+  isModalOpen: boolean;
+  onModalOpenChange?: (isOpen: boolean) => void;
 }
 
-export default function FloatingButtonGroup({ onMemoCreate }: FloatingButtonGroupProps) {
+export default function FloatingButtonGroup({ onMemoCreate, isModalOpen, onModalOpenChange }: FloatingButtonGroupProps) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -16,6 +20,7 @@ export default function FloatingButtonGroup({ onMemoCreate }: FloatingButtonGrou
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const { openModal, isLoggedIn } = useApp();
 
   // 设置初始位置
   useEffect(() => {
@@ -52,7 +57,7 @@ export default function FloatingButtonGroup({ onMemoCreate }: FloatingButtonGrou
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging && containerRef.current && buttonRef.current) {
+      if (isDragging && !isModalOpen && containerRef.current && buttonRef.current) {
         const containerRect = containerRef.current.getBoundingClientRect();
         const buttonRect = buttonRef.current.getBoundingClientRect();
         
@@ -84,9 +89,10 @@ export default function FloatingButtonGroup({ onMemoCreate }: FloatingButtonGrou
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, dragOffset]);
+  }, [isDragging, dragOffset, isModalOpen]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isModalOpen) return; // 如果 Modal 打开，不处理拖动
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setDragOffset({
@@ -101,6 +107,27 @@ export default function FloatingButtonGroup({ onMemoCreate }: FloatingButtonGrou
     }
   };
 
+  // 删除memo的逻辑
+  const handleDeleteMemo = async (memoId: number) => {
+    try {
+      // 调用后端删除接口
+      await fetch(`http://localhost:8080/api/memos/${memoId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      // TODO: 这里可以加刷新列表的逻辑，比如调用props的刷新方法或全局context刷新
+      window.location.reload(); // 简单粗暴刷新页面
+    } catch (err) {
+      alert('删除失败');
+    }
+  };
+
+  // 处理通知按钮点击
+  const handleNotificationClick = () => {
+    // 根据登录状态打开相应的modal
+    openModal(isLoggedIn ? 'setting' : 'login');
+  };
+
   return (
     <div 
       ref={containerRef}
@@ -112,26 +139,25 @@ export default function FloatingButtonGroup({ onMemoCreate }: FloatingButtonGrou
         onMouseDown={handleMouseDown}
         style={{
           transform: `translate(${position.x}px, ${position.y}px)`,
-          cursor: isDragging ? 'grabbing' : 'grab',
+          cursor: 'default',
           opacity: isVisible ? 1 : 0,
           transition: 'opacity 0.1s ease-in-out',
           zIndex: 9999
         }}
         className="absolute select-none pointer-events-auto flex flex-col gap-4 p-4 rounded-2xl bg-[#F5F5DC] shadow-lg"
       >
-        <Create onMemoCreate={onMemoCreate} />
-        <button className="w-14 h-14 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition-all duration-300 flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-          </svg>
-        </button>
-        <button className="w-14 h-14 bg-yellow-500 text-white rounded-full shadow-lg hover:bg-yellow-600 transition-all duration-300 flex items-center justify-center">
+        <Create />
+        <button 
+          onClick={handleNotificationClick}
+          className="w-14 h-14 bg-yellow-500 text-white rounded-full shadow-lg hover:bg-yellow-600 transition-all duration-300 flex items-center justify-center"
+        >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
         </button>
-        <Setting />
+        <Setting onModalOpenChange={onModalOpenChange} />
       </div>
+      <ModalManager onModalOpenChange={onModalOpenChange || (()=>{})} />
     </div>
   );
 } 
