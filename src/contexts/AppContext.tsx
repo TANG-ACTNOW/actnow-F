@@ -71,13 +71,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch(API_ENDPOINTS.USER.ME, {
-          method: 'GET',
-          credentials: 'include',
-        });
-        setIsLoggedIn(response.ok);
+        try {
+          const response = await fetch(API_ENDPOINTS.USER.ME, {
+            method: 'GET',
+            credentials: 'include',
+          });
+          setIsLoggedIn(response.ok);
+        } catch {
+          setIsLoggedIn(false);
+          // 静默处理，不打印任何错误
+        }
       } catch {
-        setIsLoggedIn(false);
+        // 再次静默处理，防止外层异常冒泡
       }
     };
 

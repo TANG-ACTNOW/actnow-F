@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { PhotoIcon, ArrowsPointingOutIcon, ArrowDownTrayIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { useApp } from '@/contexts/AppContext';
+import { AboutUs } from './AboutUs';
 
 export const General: React.FC = () => {
   const { globalSettings, updateGlobalSettings } = useApp();
+  const [showAbout, setShowAbout] = useState(false);
 
   const handleBackgroundChange = () => {
     // 这里可以添加更换背景的逻辑
@@ -16,13 +18,26 @@ export const General: React.FC = () => {
   };
 
   const handleAboutUs = () => {
-    // 这里可以添加关于我们的逻辑
-    console.log('关于我们');
+    setShowAbout(true);
   };
 
   // const handleZoomChange = (newZoom: number) => {
   //   updateGlobalSettings({ pageZoom: newZoom });
   // };
+
+  if (showAbout) {
+    return (
+      <div>
+        <button
+          onClick={() => setShowAbout(false)}
+          className="mb-4 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        >
+          返回
+        </button>
+        <AboutUs />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -54,7 +69,7 @@ export const General: React.FC = () => {
           </div> */}
 
           {/* 更换背景 */}
-          <div className="flex items-center justify-between">
+          {/* <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <PhotoIcon className="w-5 h-5 text-gray-500" />
               <div>
@@ -68,10 +83,10 @@ export const General: React.FC = () => {
             >
               选择
             </button>
-          </div>
+          </div> */}
 
           {/* 导出数据 */}
-          <div className="flex items-center justify-between">
+          {/* <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <ArrowDownTrayIcon className="w-5 h-5 text-gray-500" />
               <div>
@@ -85,7 +100,7 @@ export const General: React.FC = () => {
             >
               导出
             </button>
-          </div>
+          </div> */} 
 
           {/* 关于我们 */}
           <div className="flex items-center justify-between">

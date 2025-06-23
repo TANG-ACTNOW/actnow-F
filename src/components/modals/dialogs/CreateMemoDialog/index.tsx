@@ -352,7 +352,7 @@ export const CreateMemoDialog: React.FC<BaseDialogProps> = ({ isOpen, onClose })
                   }
                   setTitle(newValue);
                 }}
-                placeholder={`输入标题，最大宽度${textLimits.title.maxWidth}单位`}
+                placeholder={`标题最大长度${textLimits.title.maxWidth}单位`}
                 className="w-full text-sm font-semibold mb-2 pr-8 font-bold bg-transparent border-none outline-none resize-none break-words"
                 style={{ 
                   color: textColor,
@@ -373,7 +373,7 @@ export const CreateMemoDialog: React.FC<BaseDialogProps> = ({ isOpen, onClose })
                   }
                   setContent(newValue);
                 }}
-                placeholder={`输入内容，最大宽度为${textLimits.content.totalUnits}个单位...`}
+                placeholder={`内容最大宽度${textLimits.content.totalUnits}个单位`}
                 className="w-full text-xs bg-transparent border-none outline-none resize-none whitespace-pre-wrap break-words flex-1"
                 style={{ 
                   color: textColor,

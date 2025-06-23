@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { UserCircleIcon, CameraIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon, CameraIcon, ArrowLeftIcon, UserIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
 import { API_BASE_URL } from '@/config/api';
 import { UserProfile } from '@/types/user';
 import { useApp } from '@/contexts/AppContext';
@@ -145,49 +145,32 @@ export const Edit: React.FC<{
               </label>
             </div>
             <div>
-              <h4 className="text-lg font-medium">头像</h4>
               <p className="text-sm text-gray-500">点击相机图标更换头像</p>
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">用户名</label>
-              <input
-                type="text"
-                name="displayName"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="请输入用户名"
-                value={formData.displayName}
-                onChange={handleInputChange}
-              />
+              <div className="relative mt-1 rounded-md shadow-sm">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <UserIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                </div>
+                <input
+                  type="text"
+                  name="displayName"
+                  className="block w-full rounded-md border-0 py-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                  placeholder="请输入用户名"
+                  value={formData.displayName}
+                  onChange={handleInputChange}
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">邮箱</label>
-              <input
-                type="email"
-                name="email"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="请输入邮箱"
-                value={formData.email}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-
-          <div className="mt-4">
-            <div className="text-sm text-gray-600">
-              <p>注册时间：{new Date(profile?.createdAt || '').toLocaleDateString()}</p>
-              <p>登录方式：{profile?.provider}</p>
-              <p>当前便签数：{profile?.memoCount} / {profile?.plan.maxMemoCount}</p>
-              <p>解锁样式数：{profile?.unlockedStyleCount}</p>
-            </div>
-          </div>
-
-          <div className="pt-4">
-            <SlideToSave onSave={handleSave} disabled={saving} />
           </div>
         </div>
+      </div>
+      <div className="pt-2">
+        <SlideToSave onSave={handleSave} disabled={saving} />
       </div>
     </div>
   );

@@ -71,38 +71,14 @@ export const Profile: React.FC<{
                 <UserCircleIcon className="w-12 h-12 text-gray-400" />
               )}
             </div>
-            <div>
-              <h4 className="text-lg font-medium">头像</h4>
-              <p className="text-sm text-gray-500">在编辑页面更换头像</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">用户名</label>
-              <input
-                type="text"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="请输入用户名"
-                value={profile?.displayName || ''}
-                readOnly
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">邮箱</label>
-              <input
-                type="email"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="请输入邮箱"
-                value={profile?.email || ''}
-                readOnly
-              />
+            <div className="flex-1">
+              <h4 className="text-lg font-medium text-gray-900">{profile?.displayName || '未设置用户名'}</h4>
+              <p className="text-sm text-gray-500">{profile?.email || '未设置邮箱'}</p>
+              <p className="text-sm text-gray-500">当前便签数：{profile?.memoCount} / {profile?.plan.maxMemoCount}</p>
             </div>
           </div>
           <div className="mt-4">
             <div className="text-sm text-gray-600">
-              <p>注册时间：{new Date(profile?.createdAt || '').toLocaleDateString()}</p>
-              <p>登录方式：{profile?.provider}</p>
-              <p>当前便签数：{profile?.memoCount} / {profile?.plan.maxMemoCount}</p>
               <p>解锁样式数：{profile?.unlockedStyleCount}</p>
             </div>
           </div>
@@ -110,9 +86,9 @@ export const Profile: React.FC<{
       </div>
       
       <div className="space-y-4">
-        <div>
+        {/* <div>
           <SlideToEdit onEdit={handleEdit} />
-        </div>
+        </div> */}
         
         <div>
           <SlideToLogout onLogout={handleLogout} />

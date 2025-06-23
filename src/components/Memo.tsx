@@ -63,7 +63,7 @@ export default function Memo({ memo, onDragStart, onSelect }: MemoProps) {
         zIndex: memo.zindex,
         ...memoStyle
       }}
-      className={`${style.size.width} ${style.size.height} p-3 rounded-lg transition-shadow hover:shadow-xl select-none relative border-2`}
+      className={`${style.size.width} ${style.size.height} p-3 rounded-lg shadow-xl transition-shadow hover:shadow-2xl select-none relative border-2`}
       onMouseDown={handleMouseDown}
     >
       {/* 图片背景的遮罩层 */}

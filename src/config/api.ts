@@ -8,6 +8,10 @@ export const API_ENDPOINTS = {
     LOGIN: `${API_BASE_URL}/api/auth/login`,
     REGISTER: `${API_BASE_URL}/api/auth/register`,
     LOGOUT: `${API_BASE_URL}/api/auth/logout`,
+    // Magic Link 验证码登录/注册相关
+    MAGIC_REQUEST: `${API_BASE_URL}/api/auth/magic-link/request`,
+    MAGIC_VERIFY: `${API_BASE_URL}/api/auth/magic-link/verify`,
+    MAGIC_REGISTER: `${API_BASE_URL}/api/auth/magic-link/register`,
   },
   // 用户相关
   USER: {

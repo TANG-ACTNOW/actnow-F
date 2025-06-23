@@ -27,11 +27,11 @@ export function SettingDialog({ onClose }: SettingDialogProps) {
       label: '通用设置',
       icon: <Cog6ToothIcon className="w-5 h-5" />
     },
-    {
-      id: 'plan',
-      label: '订阅计划',
-      icon: <CreditCardIcon className="w-5 h-5" />
-    }
+    // {
+    //   id: 'plan',
+    //   label: '订阅计划',
+    //   icon: <CreditCardIcon className="w-5 h-5" />
+    // }
   ];
 
   const renderContent = () => {
