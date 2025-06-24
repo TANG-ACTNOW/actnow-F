@@ -1,5 +1,5 @@
 // API基础URL
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/api';
 
 // API端点配置
 export const API_ENDPOINTS = {
