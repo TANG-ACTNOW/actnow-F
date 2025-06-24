@@ -354,7 +354,7 @@ export const CreateMemoDialog: React.FC<BaseDialogProps> = ({ isOpen, onClose })
                   setTitle(newValue);
                 }}
                 placeholder={`标题最大长度${textLimits.title.maxWidth}单位`}
-                className="w-full text-sm font-semibold mb-2 pr-8 font-bold bg-transparent border-none outline-none resize-none break-words"
+                className="w-full text-sm mb-2 pr-8 font-bold bg-transparent border-none outline-none resize-none break-words"
                 style={{ 
                   color: textColor,
                   caretColor: textColor

@@ -82,7 +82,7 @@ export default function Memo({ memo, onDragStart, onSelect }: MemoProps) {
           </svg>
         </button>
         <h3 
-          className="text-sm font-semibold mb-2 pr-8 font-bold break-words"
+          className="text-sm mb-2 pr-8 font-bold break-words"
           style={{ color: textColor }}
         >
           {memo.title}
