@@ -5,6 +5,7 @@ import Create from '@/components/buttons/Create';
 import { MemoResponse } from '@/types/memo';
 import { ModalManager } from '@/components/modals/ModalManager';
 import { useApp } from '@/contexts/AppContext';
+import { API_ENDPOINTS } from '@/config/api';
 
 interface FloatingButtonGroupProps {
   onMemoCreate: (memo: MemoResponse) => void;
@@ -111,7 +112,7 @@ export default function FloatingButtonGroup({ isModalOpen, onModalOpenChange }: 
   const handleDeleteMemo = async (memoId: number) => {
     try {
       // 调用后端删除接口
-      await fetch(`http://localhost:8080/api/memos/${memoId}`, {
+      await fetch(API_ENDPOINTS.MEMO.DELETE(memoId), {
         method: 'DELETE',
         credentials: 'include',
       });

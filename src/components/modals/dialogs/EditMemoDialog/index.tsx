@@ -5,6 +5,7 @@ import { SlideToDelete, SlideToUpdate } from '@/components/modals/ui/Slide';
 import { getStyleById, getStyleByCode } from '@/config/styles';
 import { StyleSelector } from '@/components/modals/ui/StyleSelector';
 import { ColorSelector } from '@/components/modals/ui/ColorSelector';
+import { API_ENDPOINTS } from '@/config/api';
 
 // 计算字符的视觉宽度
 const getCharWidth = (char: string): number => {
@@ -263,7 +264,7 @@ export const EditMemoDialog: React.FC<BaseDialogProps> = ({ isOpen, onClose }) =
       const requestBody = { title, content, color, styleCode };
       console.log('Request body:', requestBody);
 
-      await fetch(`http://localhost:8080/api/memos/${currentEditingMemo.id}`, {
+      await fetch(API_ENDPOINTS.MEMO.UPDATE(currentEditingMemo.id), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
@@ -312,7 +313,7 @@ export const EditMemoDialog: React.FC<BaseDialogProps> = ({ isOpen, onClose }) =
     setLoading(true);
     setError(null);
     try {
-      await fetch(`http://localhost:8080/api/memos/${currentEditingMemo.id}`, {
+      await fetch(API_ENDPOINTS.MEMO.DELETE(currentEditingMemo.id), {
         method: 'DELETE',
         credentials: 'include',
       })

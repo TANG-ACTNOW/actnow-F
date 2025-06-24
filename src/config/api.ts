@@ -18,6 +18,9 @@ export const API_ENDPOINTS = {
     ME: `${API_BASE_URL}/api/users/me`,
     BY_ID: (id: string) => `${API_BASE_URL}/api/users/${id}`,
     BY_USERNAME: (username: string) => `${API_BASE_URL}/api/users/username/${username}`,
+    // 用户资料相关
+    PROFILE: `${API_BASE_URL}/api/users/me/profile`,
+    AVATAR: `${API_BASE_URL}/api/users/me/avatar`,
   },
   // 首页相关
   HOME: {
@@ -25,6 +28,10 @@ export const API_ENDPOINTS = {
   },
   // 便签相关
   MEMO: {
+    CREATE: `${API_BASE_URL}/api/memos`,
+    BY_ID: (id: number) => `${API_BASE_URL}/api/memos/${id}`,
+    UPDATE: (id: number) => `${API_BASE_URL}/api/memos/${id}`,
+    DELETE: (id: number) => `${API_BASE_URL}/api/memos/${id}`,
     UPDATE_POSITION: (id: number) => `${API_BASE_URL}/api/memos/${id}/position`,
   },
   // 其他API端点...

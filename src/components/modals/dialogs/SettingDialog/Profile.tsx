@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
-import { API_BASE_URL } from '@/config/api';
+import { API_ENDPOINTS } from '@/config/api';
 import { UserProfile } from '@/types/user';
 import { useApp } from '@/contexts/AppContext';
 import { SlideToLogout, SlideToEdit } from '@/components/modals/ui/Slide';
@@ -34,7 +34,7 @@ export const Profile: React.FC<{
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/users/me/profile`, {
+        const response = await fetch(API_ENDPOINTS.USER.PROFILE, {
           credentials: 'include'
         });
         if (!response.ok) throw new Error('Failed to fetch profile');

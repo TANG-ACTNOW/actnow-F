@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { UserCircleIcon, CameraIcon, ArrowLeftIcon, UserIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
-import { API_BASE_URL } from '@/config/api';
+import { API_ENDPOINTS } from '@/config/api';
 import { UserProfile } from '@/types/user';
 import { useApp } from '@/contexts/AppContext';
 import { SettingTabType } from '@/types/user';
@@ -22,7 +22,7 @@ export const Edit: React.FC<{
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/users/me/profile`, {
+        const response = await fetch(API_ENDPOINTS.USER.PROFILE, {
           credentials: 'include'
         });
         if (!response.ok) throw new Error('Failed to fetch profile');
@@ -55,7 +55,7 @@ export const Edit: React.FC<{
     
     setSaving(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/users/me/profile`, {
+      const response = await fetch(API_ENDPOINTS.USER.PROFILE, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export const Edit: React.FC<{
     formData.append('avatar', file);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/users/me/avatar`, {
+      const response = await fetch(API_ENDPOINTS.USER.AVATAR, {
         method: 'POST',
         credentials: 'include',
         body: formData
