@@ -7,8 +7,8 @@ WORKDIR /app
 # 3. 复制 package.json 和 lock 文件，优化缓存
 COPY package.json package-lock.json* ./
 
-# 4. 安装生产依赖
-RUN npm ci --only=production
+# 4. 安装所有依赖（包括开发依赖，用于构建）
+RUN npm ci
 
 # 5. 复制所有项目文件
 COPY . .
@@ -20,7 +20,7 @@ RUN npm run build
 FROM node:22-alpine AS runner
 
 # 8. 设置运行环境变量
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 # 9. 创建非root用户以提高安全性
 RUN addgroup --system --gid 1001 nodejs
@@ -46,8 +46,8 @@ USER nextjs
 EXPOSE 3000
 
 # 15. 设置环境变量
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 # 16. 运行 Next.js 应用
 CMD ["node", "server.js"] 
