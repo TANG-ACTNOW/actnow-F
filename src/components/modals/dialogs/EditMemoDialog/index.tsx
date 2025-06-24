@@ -5,7 +5,7 @@ import { SlideToDelete, SlideToUpdate } from '@/components/modals/ui/Slide';
 import { getStyleById, getStyleByCode } from '@/config/styles';
 import { StyleSelector } from '@/components/modals/ui/StyleSelector';
 import { ColorSelector } from '@/components/modals/ui/ColorSelector';
-import { API_ENDPOINTS } from '@/config/api';
+import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
 
 // 计算字符的视觉宽度
 const getCharWidth = (char: string): number => {
@@ -531,4 +531,6 @@ function getStyleIdFromSize(size: string): number {
     // 'nature': 5
   };
   return styleIdMap[size] || 1;
-} 
+}
+
+console.log('API_BASE_URL:', API_BASE_URL); 
