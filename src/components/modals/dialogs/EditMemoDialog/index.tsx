@@ -271,7 +271,7 @@ export const EditMemoDialog: React.FC<BaseDialogProps> = ({ isOpen, onClose }) =
       })
         .then(async res => {
           if (!res.ok) {
-            let errText = await res.text();
+            const errText = await res.text();
             let errMsg = '更新失败';
             try {
               const errJson = JSON.parse(errText);
@@ -318,7 +318,7 @@ export const EditMemoDialog: React.FC<BaseDialogProps> = ({ isOpen, onClose }) =
       })
         .then(async res => {
           if (!res.ok) {
-            let errText = await res.text();
+            const errText = await res.text();
             let errMsg = '删除失败';
             try {
               const errJson = JSON.parse(errText);

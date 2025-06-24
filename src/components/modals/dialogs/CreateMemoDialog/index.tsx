@@ -253,7 +253,7 @@ export const CreateMemoDialog: React.FC<BaseDialogProps> = ({ isOpen, onClose })
       })
         .then(async res => {
           if (!res.ok) {
-            let errText = await res.text();
+            const errText = await res.text();
             let errMsg = '创建失败';
             try {
               const errJson = JSON.parse(errText);

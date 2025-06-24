@@ -12,7 +12,7 @@ interface FloatingButtonGroupProps {
   onModalOpenChange?: (isOpen: boolean) => void;
 }
 
-export default function FloatingButtonGroup({ onMemoCreate, isModalOpen, onModalOpenChange }: FloatingButtonGroupProps) {
+export default function FloatingButtonGroup({ isModalOpen, onModalOpenChange }: FloatingButtonGroupProps) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -117,7 +117,7 @@ export default function FloatingButtonGroup({ onMemoCreate, isModalOpen, onModal
       });
       // TODO: 这里可以加刷新列表的逻辑，比如调用props的刷新方法或全局context刷新
       window.location.reload(); // 简单粗暴刷新页面
-    } catch (err) {
+    } catch {
       alert('删除失败');
     }
   };

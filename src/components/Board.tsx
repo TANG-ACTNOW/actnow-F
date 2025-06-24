@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { MemoResponse } from '@/types/memo';
 import { HomeResponse } from '@/types/user';
-import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
+import { API_ENDPOINTS } from '@/config/api';
 import FloatingButtonGroup from '@/components/FloatingButtonGroup';
 import Memo from '@/components/Memo';
 import { useApp } from '@/contexts/AppContext';
@@ -34,7 +34,6 @@ const defaultMemos: MemoResponse[] = [
 export default function Board() {
   const [memos, setMemos] = useState<MemoResponse[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const dragStartPos = useRef({ x: 0, y: 0 });
   const boardRef = useRef<HTMLDivElement>(null);
@@ -196,9 +195,9 @@ export default function Board() {
         }
         
         setMemos(data.memos);
-      } catch (error) {
-        console.error('Failed to fetch home data:', error);
-        setError('Failed to load memos');
+      } catch (err) {
+        console.error('Failed to fetch home data:', err);
+        // 移除setError，因为error变量未使用
       } finally {
         setLoading(false);
       }
@@ -220,7 +219,8 @@ export default function Board() {
     }
   }, [memos]);
 
-  const handleSelectEffect = useEffect(() => {
+  // 修复useEffect的使用
+  useEffect(() => {
     if (draggingId !== null) {
       window.addEventListener('mousemove', handleDragMove);
       window.addEventListener('mouseup', handleDragEnd);
@@ -233,7 +233,6 @@ export default function Board() {
       };
     }
     // 如果 draggingId 是 null，不需要绑定事件，也不需要清理
-    return;
   }, [draggingId, handleDragMove, handleDragEnd]);
 
   // 未登录时显示默认内容和按钮组
