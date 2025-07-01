@@ -56,42 +56,6 @@ export default function FloatingButtonGroup({ isModalOpen, onModalOpenChange }: 
     return () => window.removeEventListener('resize', handleResize);
   }, [position]);
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging && !isModalOpen && containerRef.current && buttonRef.current) {
-        const containerRect = containerRef.current.getBoundingClientRect();
-        const buttonRect = buttonRef.current.getBoundingClientRect();
-        
-        // 计算相对于容器的位置
-        const x = e.clientX - containerRect.left - dragOffset.x;
-        const y = e.clientY - containerRect.top - dragOffset.y;
-        
-        // 限制在容器范围内，并保持60px的边距
-        const maxX = containerRect.width - buttonRect.width - 60;
-        const maxY = containerRect.height - buttonRect.height - 60;
-        
-        setPosition({
-          x: Math.min(Math.max(60, x), maxX),
-          y: Math.min(Math.max(60, y), maxY)
-        });
-      }
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, dragOffset, isModalOpen]);
-
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isModalOpen) return; // 如果 Modal 打开，不处理拖动
     if (buttonRef.current) {
@@ -107,6 +71,55 @@ export default function FloatingButtonGroup({ isModalOpen, onModalOpenChange }: 
       setIsDragging(true);
     }
   };
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (isModalOpen) return;
+    if (buttonRef.current) {
+      const touch = e.touches[0];
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDragOffset({
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+      });
+      setStartPosition({
+        x: touch.clientX,
+        y: touch.clientY
+      });
+      setIsDragging(true);
+    }
+  };
+
+  useEffect(() => {
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDragging && !isModalOpen && containerRef.current && buttonRef.current) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const buttonRect = buttonRef.current.getBoundingClientRect();
+        const x = touch.clientX - containerRect.left - dragOffset.x;
+        const y = touch.clientY - containerRect.top - dragOffset.y;
+        const maxX = containerRect.width - buttonRect.width - 60;
+        const maxY = containerRect.height - buttonRect.height - 60;
+        setPosition({
+          x: Math.min(Math.max(60, x), maxX),
+          y: Math.min(Math.max(60, y), maxY)
+        });
+      }
+    };
+    const handleTouchEnd = () => {
+      setIsDragging(false);
+    };
+    if (isDragging) {
+      document.addEventListener('touchmove', handleTouchMove as EventListener, false);
+      document.addEventListener('touchend', handleTouchEnd);
+      document.addEventListener('touchcancel', handleTouchEnd);
+    }
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove as EventListener, false);
+      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('touchcancel', handleTouchEnd);
+    };
+  }, [isDragging, dragOffset, isModalOpen]);
 
   // 删除memo的逻辑
   const handleDeleteMemo = async (memoId: number) => {
@@ -138,12 +151,14 @@ export default function FloatingButtonGroup({ isModalOpen, onModalOpenChange }: 
       <div 
         ref={buttonRef}
         onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
         style={{
           transform: `translate(${position.x}px, ${position.y}px)`,
           cursor: 'default',
           opacity: isVisible ? 1 : 0,
           transition: 'opacity 0.1s ease-in-out',
-          zIndex: 9999
+          zIndex: 9999,
+          touchAction: 'none',
         }}
         className="absolute select-none pointer-events-auto flex flex-col gap-4 p-4 rounded-2xl bg-[#F5F5DC] shadow-lg"
       >

@@ -31,6 +31,19 @@ export default function Memo({ memo, onDragStart, onSelect }: MemoProps) {
     }
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (memoRef.current) {
+      const touch = e.touches[0];
+      const rect = memoRef.current.getBoundingClientRect();
+      const startPos = {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+      };
+      onDragStart(memo.id, startPos);
+      onSelect(memo.id);
+    }
+  };
+
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // 阻止事件冒泡，避免触发拖拽
     // 根据登录状态打开相应的modal
@@ -61,10 +74,12 @@ export default function Memo({ memo, onDragStart, onSelect }: MemoProps) {
         left: memo.x,
         top: memo.y,
         zIndex: memo.zindex,
-        ...memoStyle
+        ...memoStyle,
+        touchAction: 'none',
       }}
       className={`${style.size.width} ${style.size.height} p-3 rounded-lg shadow-xl transition-shadow hover:shadow-2xl select-none relative border-2`}
       onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
     >
       {/* 图片背景的遮罩层 */}
       {style.type === 'image' && style.overlay && (

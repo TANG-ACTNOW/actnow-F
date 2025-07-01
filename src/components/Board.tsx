@@ -219,21 +219,74 @@ export default function Board() {
     }
   }, [memos]);
 
-  // 修复useEffect的使用
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    e.preventDefault();
+    if (draggingId === null) return;
+    if (!boardRef.current) return;
+    const memo = memos.find(m => m.id === draggingId);
+    if (!memo) return;
+    const memoElement = boardRef.current.querySelector(`[data-memo-id="${draggingId}"]`) as HTMLElement;
+    if (!memoElement) return;
+    const boundaries = calculateBoundaries(memoElement.offsetWidth, memoElement.offsetHeight);
+    const touch = e.touches[0];
+    const newX = Math.min(Math.max(touch.clientX - dragStartPos.current.x, boundaries.minX), boundaries.maxX);
+    const newY = Math.min(Math.max(touch.clientY - dragStartPos.current.y, boundaries.minY), boundaries.maxY);
+    setMemos(prevMemos => prevMemos.map(m => 
+      m.id === draggingId ? { ...m, x: newX, y: newY } : m
+    ));
+  }, [draggingId, memos, calculateBoundaries]);
+
+  const handleTouchEnd = useCallback(() => {
+    window.removeEventListener('touchmove', handleTouchMove as EventListener, false);
+    window.removeEventListener('touchend', handleTouchEnd);
+    window.removeEventListener('touchcancel', handleTouchEnd);
+    if (draggingId === null) return;
+    const memo = memos.find(m => m.id === draggingId);
+    const original = originalPosition.current;
+    if (!memo || !original) {
+      setDraggingId(null);
+      originalPosition.current = null;
+      return;
+    }
+    const movedX = Math.round(memo.x);
+    const movedY = Math.round(memo.y);
+    const originalX = Math.round(original.x);
+    const originalY = Math.round(original.y);
+    const hasMoved = movedX !== originalX || movedY !== originalY;
+    if (!hasMoved) {
+      setDraggingId(null);
+      originalPosition.current = null;
+      return;
+    }
+    updatePosition(memo.id, movedX, movedY).then(result => {
+      if (!result.success) {
+        setMemos(prevMemos => prevMemos.map(m =>
+          m.id === draggingId ? { ...m, x: originalX, y: originalY } : m
+        ));
+      }
+      setDraggingId(null);
+      originalPosition.current = null;
+    });
+  }, [draggingId, memos, updatePosition, handleTouchMove]);
+
   useEffect(() => {
     if (draggingId !== null) {
       window.addEventListener('mousemove', handleDragMove);
       window.addEventListener('mouseup', handleDragEnd);
       window.addEventListener('mouseleave', handleDragEnd);
-      // 清理函数
+      window.addEventListener('touchmove', handleTouchMove as EventListener, false);
+      window.addEventListener('touchend', handleTouchEnd);
+      window.addEventListener('touchcancel', handleTouchEnd);
       return () => {
         window.removeEventListener('mousemove', handleDragMove);
         window.removeEventListener('mouseup', handleDragEnd);
         window.removeEventListener('mouseleave', handleDragEnd);
+        window.removeEventListener('touchmove', handleTouchMove as EventListener, false);
+        window.removeEventListener('touchend', handleTouchEnd);
+        window.removeEventListener('touchcancel', handleTouchEnd);
       };
     }
-    // 如果 draggingId 是 null，不需要绑定事件，也不需要清理
-  }, [draggingId, handleDragMove, handleDragEnd]);
+  }, [draggingId, handleDragMove, handleDragEnd, handleTouchMove, handleTouchEnd]);
 
   // 未登录时显示默认内容和按钮组
   if (!isLoggedIn) {
