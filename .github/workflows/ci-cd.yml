@@ -1,9 +1,6 @@
 name: ActNow CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -58,6 +55,9 @@ jobs:
             # 停止并删除旧容器（如果存在）
             docker stop actnow || true
             docker rm actnow || true
+            
+            # 清理未使用的镜像（可选，节省空间）
+            docker image prune -a -f
             
             # 拉取最新镜像
             docker pull ${{ secrets.DOCKER_USERNAME }}/actnow:latest

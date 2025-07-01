@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 interface SlideToConfirmProps {
   onConfirm: () => boolean | Promise<boolean>;
@@ -17,6 +17,8 @@ export const SlideToConfirm: React.FC<SlideToConfirmProps> = ({
 }) => {
   const [progress, setProgress] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const sliderRef = useRef<HTMLInputElement>(null);
+  const startX = useRef<number | null>(null);
 
   const colorMap = {
     red: '#ef4444',
@@ -27,65 +29,82 @@ export const SlideToConfirm: React.FC<SlideToConfirmProps> = ({
 
   const selectedColor = colorMap[color];
 
-  const handleSlide = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTouchStart = (e: React.TouchEvent) => {
     if (disabled || isProcessing) return;
+    const touch = e.touches[0];
+    startX.current = touch.clientX;
+  };
 
-    const newProgress = parseInt(e.target.value);
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (disabled || isProcessing || startX.current === null || !sliderRef.current) return;
+
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - startX.current;
+    const sliderWidth = sliderRef.current.offsetWidth;
+
+    // 将滑动距离转为百分比进度
+    let newProgress = Math.min(Math.max(0, progress + (deltaX / sliderWidth) * 150), 100);
     setProgress(newProgress);
+    startX.current = touch.clientX;
+  };
 
-    if (newProgress >= 100) {
+  const handleTouchEnd = async () => {
+    startX.current = null;
+    if (progress >= 100) {
       setIsProcessing(true);
       try {
         const result = await onConfirm();
-        if (result) {
-          setProgress(0); // 重置进度
-        } else {
-          setProgress(0); // 重置进度但不完成操作
+        if (!result) {
+          setProgress(0);
         }
-      } catch (error) {
-        console.error('SlideToConfirm error:', error);
-        setProgress(0); // 出错时重置进度
+      } catch (err) {
+        console.error("SlideToConfirm error:", err);
       } finally {
+        setProgress(0);
         setIsProcessing(false);
       }
+    } else {
+      setProgress(0);
     }
   };
 
   return (
-<div className="relative w-full">
-  {/* 滑动条 */}
-  <input
-    type="range"
-    min="0"
-    max="100"
-    value={progress}
-    onChange={handleSlide}
-    disabled={disabled || isProcessing}
-    className={`relative z-10 w-full h-12 appearance-none rounded-full outline-none cursor-pointer transition-opacity ${
-      (disabled || isProcessing) ? 'opacity-50 cursor-not-allowed' : ''
-    } custom-slider`}
-    style={{
-      background: `linear-gradient(to right, ${selectedColor} 0%, ${selectedColor} ${progress}%, #e5e7eb ${progress}%, #e5e7eb 100%)`,
-      WebkitAppearance: 'none',
-      MozAppearance: 'none',
-      appearance: 'none',
-    }}
-  />
+    <div className={`relative w-full ${className}`} style={{ userSelect: 'none' }}>
+      <input
+        ref={sliderRef}
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        value={progress}
+        readOnly // 禁止浏览器默认滑动行为
+        disabled={disabled || isProcessing}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className={`relative z-10 w-full h-12 appearance-none rounded-full outline-none cursor-pointer transition-opacity ${
+          (disabled || isProcessing) ? 'opacity-50 cursor-not-allowed' : ''
+        } custom-slider`}
+        style={{
+          background: `linear-gradient(to right, ${selectedColor} 0%, ${selectedColor} ${progress}%, #e5e7eb ${progress}%, #e5e7eb 100%)`,
+          WebkitAppearance: 'none',
+          MozAppearance: 'none',
+          appearance: 'none',
+        }}
+      />
 
-  {/* 中央文字，确保与input相同高度 */}
-  <div
-    className="absolute left-0 right-0 flex items-center justify-center pointer-events-none"
-    style={{
-      top: 0,
-      height: '48px', // 与input的h-12 (48px) 保持一致
-      zIndex: 20,
-    }}
-  >
-    <span className="text-sm text-gray-500 font-medium select-none" style={{ opacity: 0.7 }}>
-      {title}
-    </span>
-  </div>
-</div>
-
+      <div
+        className="absolute left-0 right-0 flex items-center justify-center pointer-events-none"
+        style={{
+          top: 0,
+          height: '48px',
+          zIndex: 20,
+        }}
+      >
+        <span className="text-sm text-gray-500 font-medium select-none" style={{ opacity: 0.7 }}>
+          {title}
+        </span>
+      </div>
+    </div>
   );
-}; 
+};
