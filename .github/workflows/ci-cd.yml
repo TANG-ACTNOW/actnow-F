@@ -4,11 +4,15 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - main
 
 jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
 
     steps:
       - name: Checkout Repository
@@ -42,7 +46,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: Deploy to EC2
@@ -55,7 +59,7 @@ jobs:
             # 停止并删除旧容器（如果存在）
             docker stop actnow || true
             docker rm actnow || true
-            
+
             # 清理未使用的镜像（可选，节省空间）
             docker image prune -a -f
             
