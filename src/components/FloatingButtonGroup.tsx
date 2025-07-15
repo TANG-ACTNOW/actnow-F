@@ -56,6 +56,38 @@ export default function FloatingButtonGroup({ isModalOpen, onModalOpenChange }: 
     return () => window.removeEventListener('resize', handleResize);
   }, [position]);
 
+  // 新增：PC端鼠标拖动监听
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging && !isModalOpen && containerRef.current && buttonRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const buttonRect = buttonRef.current.getBoundingClientRect();
+        const x = e.clientX - containerRect.left - dragOffset.x;
+        const y = e.clientY - containerRect.top - dragOffset.y;
+        const maxX = containerRect.width - buttonRect.width - 60;
+        const maxY = containerRect.height - buttonRect.height - 60;
+        setPosition({
+          x: Math.min(Math.max(60, x), maxX),
+          y: Math.min(Math.max(60, y), maxY)
+        });
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, dragOffset, isModalOpen]);
+
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isModalOpen) return; // 如果 Modal 打开，不处理拖动
     if (buttonRef.current) {
